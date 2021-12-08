@@ -97,7 +97,7 @@ var app = new Vue({
 			}
 		},
 		getUnspentTransactions: async (sendAmount, tx, keyPair) => {
-			let res = await fetch(`${app.baseURL}/api/address/${app.address}/utxo`);
+			let res = await fetch(`${app.baseURL}/get_tx_unspent/BTCTEST/${app.address}`);
 			return await res.json();
 		},
 		maxAmount: function () {
@@ -186,14 +186,14 @@ var app = new Vue({
 			window.location.reload();
 		},
 		updateTransactions: async () => {
-			let res = await fetch(`${app.baseURL}/api/address/${app.address}`);
+			let res = await fetch(`${app.baseURL}/get_address_balance/BTCTEST/${app.address}`);
 			let data = await res.json();
 
-			if (app[app.current].amount != data['chain_stats']) {
+			if (app[app.current].amount != data.data.confirmed_balance {
 				document.getElementById('audio').play();
 			}
 
-			app[app.current].amount = data['chain_stats'];
+			app[app.current].amount = data.data.confirmed_balance;
 
 			res = await fetch(`${app.baseURL}/api/address/${app.address}/txs`);
 			data = await res.json();
@@ -209,7 +209,7 @@ var app = new Vue({
 			return `${this[this.current].amount} t${this[this.current].symbol}`;
 		},
 		baseURL: function () {
-			return app.symbol == "BTC" ? "https://mempool.space/testnet" : "https://testnet.litecore.io"
+			return app.symbol == "BTC" ? "https://chain.so/api/v2" : "https://testnet.litecore.io"
 		},
 		color: function () {
 			return this[this.current].color;
