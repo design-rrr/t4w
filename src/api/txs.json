@@ -1,0 +1,17 @@
+{
+  "txs": 3,
+  "data": [
+  {
+    "txid": "0fee",
+    "version": 1
+  },
+  {
+    "txid": "abef",
+    "version": 1
+  },
+  {
+    "txid": "aabb",
+    "version": 1
+  }
+ ]
+}

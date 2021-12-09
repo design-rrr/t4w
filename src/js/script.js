@@ -97,7 +97,8 @@ var app = new Vue({
 			}
 		},
 		getUnspentTransactions: async (sendAmount, tx, keyPair) => {
-			let res = await fetch(`${app.baseURL}/api/addr/${app.address}/utxo`);
+			//let res = await fetch(`${app.baseURL}/api/addr/${app.address}/utxo`);
+			let res = await fetch(`/api/utxo.json`);
 			return await res.json();
 		},
 		maxAmount: function () {
@@ -115,7 +116,8 @@ var app = new Vue({
 			let formData = new FormData();
 			formData.append('rawtx', hex);
 
-			let res = await fetch(`${app.baseURL}/api/tx/send`, {
+			//let res = await fetch(`${app.baseURL}/api/tx/send`, {
+			let res = await fetch(`/api/send.json`, {
 				method: "POST",
 				body: new URLSearchParams(formData)
 			});
@@ -187,23 +189,26 @@ var app = new Vue({
 			window.location.reload();
 		},
 		updatePrices: async () => {
-			let res = await fetch(`https://min-api.cryptocompare.com/data/pricemulti?fsyms=BTC,LTC&tsyms=${app.currentFiat}`);
+			//let res = await fetch(`https://min-api.cryptocompare.com/data/pricemulti?fsyms=BTC,LTC&tsyms=${app.currentFiat}`);
+			let res = await fetch(`/api/cryptocompare.json`);
 			let data = await res.json();
 
 			app.bitcoin.price = data['BTC'][app.currentFiat];
 			app.litecoin.price = data['LTC'][app.currentFiat];
 		},
 		updateTransactions: async () => {
-			let res = await fetch(`${app.baseURL}/api/addr/${app.address}`);
+			//let res = await fetch(`${app.baseURL}/api/addr/${app.address}`);
+			let res = await fetch(`/api/addr.json`);
 			let data = await res.json();
 
-			if (app[app.current].amount != data['balance']) {
-				document.getElementById('audio').play();
-			}
+			//if (app[app.current].amount != data['balance']) {
+			//	document.getElementById('audio').play();
+			//}
 
 			app[app.current].amount = data['balance'];
 
-			res = await fetch(`${app.baseURL}/api/txs/?address=${app.address}`);
+			//res = await fetch(`${app.baseURL}/api/txs/?address=${app.address}`);
+			res = await fetch(`/api/txs.json`);
 			data = await res.json();
 
 			app[app.current].tx = data['txs'].length ? data['txs'] : [];
