@@ -124,9 +124,9 @@
 					</thead>
 					<tbody>
 						<tr v-for="tx in transactions">
-							<td v-if="tx.vin[0].addr == address">
+							<td v-if="tx.vin[0].prevout.scriptpubkey_address == address">
 								<i class="medium circular inverted red arrow right icon"></i>
-								<i v-if="true" class="medium hourglass start icon"></i>
+								<i v-if="! tx.status.confirmed" class="medium hourglass start icon"></i>
 							</td>
 							<td v-else>
 								<i class="medium circular inverted green arrow left icon"></i>
