@@ -92,10 +92,10 @@ var app = new Vue({
 		},
 		sendTx: async (hex) => {
 			let formData = new FormData();
-			formData.append('rawtx', hex);
+			formData.append(hex);
 
 			//let res = await fetch(`/api/send.json`, {
-			let res = await fetch(`${app.baseURL}/api/tx/send`, {
+			let res = await fetch(`${app.baseURL}/api/tx`, {
 				method: "POST",
 				body: new URLSearchParams(formData)
 			});
