@@ -2,9 +2,17 @@
 <html lang="en">
 <head>
 	<meta charset="UTF-8">
-	<title>BLT Wallet - Testnet Wallet for Bitcoin & Litecoin</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>BLT Wallet - Signet Wallet for Bitcoin</title>
 	<link rel="stylesheet" type="text/css" href="css/semantic.min.css">
 	<link rel="stylesheet" type="text/css" href="css/style.css">
+    <style>
+	.word-wrap {
+		word-wrap: break-word;
+		word-break: break-all;
+	}
+    </style>
 	<script src="js/jquery-3.2.1.min.js"></script>
 	<script src="js/moment.js"></script>
 	<script src="js/livestamp.js"></script>
@@ -22,7 +30,7 @@
 			</div>
 			<div class="item">
 				<strong>What is BLT wallet?</strong>
-				<br/>A web wallet for easy access to Bitcoin and Litecoin testnets. Please bookmark this URL if you want to access the same wallet again.
+				<br/>A web wallet for easy access to Bitcoin signet. Please bookmark this URL if you want to access the same wallet again.
 			</div>
 			<div class="item">
 				<div class="four ui buttons">
@@ -50,7 +58,7 @@
 				</div>
 			</div>
 			<div class="item">
-				Need some testnet coins?
+				Need some signet coins?
 			</div>
 			<a class="item" :href="faucet[1]" v-for="faucet in faucets" target="_blank">
 				{{ faucet[0] }}
@@ -58,7 +66,7 @@
 		</div>
 		<div id="horizontal" class="ui inverted menu">
 			<div class="item">
-				<div class="ui inverted header">BLT Wallet</div>
+				<div class="ui inverted header">Signet Wallet</div>
 				<div class="ui four buttons">
 					<button :class="color" class="ui basic medium icon button" data-tooltip="Create new address" data-position="bottom left" @click="init(current)">
 						<i class="large plus icon"></i>
@@ -105,8 +113,8 @@
 					<button :class="color" class="ui button" @click="copyAddress()">
 						<i class="copy icon"></i>
 						Copy Address
-					</button>
-					<h3>{{ address }}</h3>
+					</button><br>
+					<span class="word-wrap">{{ address }}</span>
 				</div>
 			</div>
 			<div class="ui center aligned container" id="transactions">
@@ -124,16 +132,16 @@
 						<tr v-for="tx in transactions">
 							<td v-if="tx.vin[0].addr == address">
 								<i class="medium circular inverted red arrow right icon"></i>
-								<i v-if="tx.confirmations < 1" class="medium hourglass start icon">
+								<i v-if="true" class="medium hourglass start icon"></i>
 							</td>
 							<td v-else>
 								<i class="medium circular inverted green arrow left icon"></i>
-								<i v-if="tx.confirmations < 1" class="medium hourglass start icon">
+								<i v-if="! tx.status.confirmed" class="medium hourglass start icon"></i>
 							</td>
 							<td><span :data-livestamp="tx.time"></span></td>
 							<td><a :href="baseURL + '/tx/' + tx.txid" target="_blank">{{ tx.txid }}</a></td>
-							<td v-if="tx.vin[0].addr == address" class="negative">-{{ tx.vout[0].value }} {{ symbol }}</td>
-							<td v-else class="positive">+{{ getOutputValue(tx.vout) }} {{ symbol }}</td>
+							<td v-if="tx.vin[0].prevout.scriptpubkey_address == address" class="negative">-{{ tx.vout[0].value / 100000000}} {{ symbol }}</td>
+							<td v-else class="positive">+{{ getOutputValue(tx.vout) / 100000000 }} {{ symbol }}</td>
 						</tr>
 				  </tbody>
 			</table>

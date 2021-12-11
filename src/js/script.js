@@ -16,13 +16,10 @@ var app = new Vue({
 			amount: 0,
 			color: "orange",
 			faucets: [
-				["qc.to", "https://testnet.qc.to/"],
-				["nkuttler", "https://kuttler.eu/en/bitcoin/btc/faucet/"],
-				["flyingkiwi", "https://testnet.manu.backend.hamburg/faucet"],
-				["coinfaucet", "https://testnet.coinfaucet.eu/en/"]
+				["signet.bublina", "https://signet.bublina.eu.org"]
 			],
 			price: 0,
-			symbol: "BTC",
+			symbol: "tBTC",
 			tx: [
 			]
 		},
@@ -93,12 +90,13 @@ var app = new Vue({
 		},
 		getOutputValue: function (vouts) {
 			for (var i = 0; i < vouts.length; i++) {
-				if (vouts[i].scriptPubKey.addresses[0] == this.address) return vouts[i].value;
+				if (vouts[i].scriptpubkey_address == this.address) return vouts[i].value;
 			}
 		},
+		// used only in Send
 		getUnspentTransactions: async (sendAmount, tx, keyPair) => {
-			//let res = await fetch(`${app.baseURL}/api/addr/${app.address}/utxo`);
-			let res = await fetch(`/api/utxo.json`);
+			let res = await fetch(`${app.baseURL}/api/address/${app.address}/utxo`);
+			//let res = await fetch(`/api/utxo.json`);
 			return await res.json();
 		},
 		maxAmount: function () {
@@ -116,8 +114,8 @@ var app = new Vue({
 			let formData = new FormData();
 			formData.append('rawtx', hex);
 
-			//let res = await fetch(`${app.baseURL}/api/tx/send`, {
-			let res = await fetch(`/api/send.json`, {
+			//let res = await fetch(`/api/send.json`, {
+			let res = await fetch(`${app.baseURL}/api/tx/send`, {
 				method: "POST",
 				body: new URLSearchParams(formData)
 			});
@@ -189,29 +187,29 @@ var app = new Vue({
 			window.location.reload();
 		},
 		updatePrices: async () => {
-			//let res = await fetch(`https://min-api.cryptocompare.com/data/pricemulti?fsyms=BTC,LTC&tsyms=${app.currentFiat}`);
-			let res = await fetch(`/api/cryptocompare.json`);
+			let res = await fetch(`https://min-api.cryptocompare.com/data/pricemulti?fsyms=BTC,LTC&tsyms=${app.currentFiat}&api_key=9718793cd89ec64a59e010eefa4a49171c4773bc30e2ceaa4cf03ad37e1f6deb`);
+			//let res = await fetch(`/api/cryptocompare.json`);
 			let data = await res.json();
 
 			app.bitcoin.price = data['BTC'][app.currentFiat];
 			app.litecoin.price = data['LTC'][app.currentFiat];
 		},
 		updateTransactions: async () => {
-			//let res = await fetch(`${app.baseURL}/api/addr/${app.address}`);
-			let res = await fetch(`/api/addr.json`);
+			let res = await fetch(`${app.baseURL}/api/address/${app.address}`);
+			//let res = await fetch(`/api/addr.json`);
 			let data = await res.json();
 
 			//if (app[app.current].amount != data['balance']) {
 			//	document.getElementById('audio').play();
 			//}
 
-			app[app.current].amount = data['balance'];
+			app[app.current].amount = (data.chain_stats.funded_txo_sum - data.chain_stats.spent_txo_sum) / 100000000;
 
-			//res = await fetch(`${app.baseURL}/api/txs/?address=${app.address}`);
-			res = await fetch(`/api/txs.json`);
+			res = await fetch(`${app.baseURL}/api/address/${app.address}/txs`);
+			//res = await fetch(`/api/txs.json`);
 			data = await res.json();
 
-			app[app.current].tx = data['txs'].length ? data['txs'] : [];
+			app[app.current].tx = data.length ? data : [];
 		}
 	},
 	computed: {
@@ -219,10 +217,11 @@ var app = new Vue({
 			return this[this.current].address;
 		},
 		amount: function () {
-			return `${this[this.current].amount} t${this[this.current].symbol}`;
+			return `${this[this.current].amount} ${this[this.current].symbol}`;
 		},
 		baseURL: function () {
-			return app.symbol == "BTC" ? "https://test-insight.bitpay.com" : "https://testnet.litecore.io"
+			//return app.symbol == "BTC" ? "https://test-insight.bitpay.com" : "https://testnet.litecore.io"
+			return app.symbol == "tBTC" ? "https://mempool.space/signet" : "https://testnet.litecore.io"
 		},
 		color: function () {
 			return this[this.current].color;
