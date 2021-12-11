@@ -23,20 +23,6 @@ var app = new Vue({
 			tx: [
 			]
 		},
-		litecoin: {
-			address: "",
-			amount: 0,
-			color: "grey",
-			faucets: [
-				["nkuttler", "https://kuttler.eu/en/bitcoin/ltc/faucet/"],
-				["lctools", "http://testnet.litecointools.com/"],
-				["thrasher", "https://testnet.thrasher.io/"]
-			],
-			price: 0,
-			symbol: "LTC",
-			tx: [
-			]
-		},
 		msg: {
 			title: "",
 			status: "positive",
@@ -62,12 +48,6 @@ var app = new Vue({
 				if (BLTWallet.checkValidAddress(address, 'bitcoin')) {
 					this.bitcoin.address = address;
 					this.current = "bitcoin";
-					return true;
-				}
-			} else if (window.location.hash[1] == "l") {
-				if (BLTWallet.checkValidAddress(address, 'litecoin')) {
-					this.litecoin.address = address;
-					this.current = "litecoin";
 					return true;
 				}
 			}
@@ -174,9 +154,6 @@ var app = new Vue({
 				title: "Address is not valid",
 				reason: "This is not a valid address"
 			};
-		},
-		switchCurrency: function () {
-			this.init(this.current == "bitcoin" ? "litecoin" : "bitcoin");
 		},
 		updateData: async () => {
 			await app.updatePrices();

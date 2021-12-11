@@ -33,12 +33,9 @@
 				<br/>A web wallet for easy access to Bitcoin signet. Please bookmark this URL if you want to access the same wallet again.
 			</div>
 			<div class="item">
-				<div class="four ui buttons">
+				<div class="three ui buttons">
 					<button :class="color" class="ui basic small icon button" data-tooltip="Create new address" data-position="top left" @click="init(current)">
 						<i class="plus icon"></i>
-					</button>
-					<button :class="color" class="ui basic small icon button" data-tooltip="Switch Currency" @click="switchCurrency();">
-						<i class="exchange icon"></i>
 					</button>
 					<button :class="color" class="ui basic top left pointing small dropdown icon button" data-tooltip="Change Fiat Currency">
 						<i class="money icon"></i>
@@ -67,12 +64,9 @@
 		<div id="horizontal" class="ui inverted menu">
 			<div class="item">
 				<div class="ui inverted header">Signet Wallet</div>
-				<div class="ui four buttons">
+				<div class="ui three buttons">
 					<button :class="color" class="ui basic medium icon button" data-tooltip="Create new address" data-position="bottom left" @click="init(current)">
 						<i class="large plus icon"></i>
-					</button>
-					<button :class="color" class="ui basic medium icon button" data-tooltip="Switch Currency" data-position="bottom left" @click="switchCurrency();">
-						<i class="large exchange icon"></i>
 					</button>
 					<button :class="color" class="ui basic pointing medium dropdown icon button" data-tooltip="Change Fiat Currency" data-position="bottom left">
 						<i class="large money icon"></i>
