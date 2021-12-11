@@ -132,7 +132,7 @@
 								<i class="medium circular inverted green arrow left icon"></i>
 								<i v-if="! tx.status.confirmed" class="medium hourglass start icon"></i>
 							</td>
-							<td><span :data-livestamp="tx.time"></span></td>
+							<td><span :data-livestamp="tx.status.block_time"></span></td>
 							<td><a :href="baseURL + '/tx/' + tx.txid" target="_blank">{{ tx.txid }}</a></td>
 							<td v-if="tx.vin[0].prevout.scriptpubkey_address == address" class="negative">-{{ tx.vout[0].value / 100000000}} {{ symbol }}</td>
 							<td v-else class="positive">+{{ getOutputValue(tx.vout) / 100000000 }} {{ symbol }}</td>
