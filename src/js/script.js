@@ -16,7 +16,8 @@ var app = new Vue({
 			amount: 0,
 			color: "orange",
 			faucets: [
-				["signet.bublina", "https://signet.bublina.eu.org"]
+				[" - signet.bublina", "https://signet.bublina.eu.org"],
+				[" - signetfaucet.com", "https://signetfaucet.com"]
 			],
 			price: 0,
 			symbol: "tBTC",
@@ -169,7 +170,6 @@ var app = new Vue({
 			let data = await res.json();
 
 			app.bitcoin.price = data['BTC'][app.currentFiat];
-			app.litecoin.price = data['LTC'][app.currentFiat];
 		},
 		updateTransactions: async () => {
 			let res = await fetch(`${app.baseURL}/api/address/${app.address}`);
