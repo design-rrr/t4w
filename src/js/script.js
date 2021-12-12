@@ -75,14 +75,14 @@ var app = new Vue({
 			}
 		},
 		// used only in Send
-		getUnspentTransactions: async (sendAmount, tx, keyPair) => {
+		getUnspentTransactions: async () => {
 			let res = await fetch(`${app.baseURL}/api/address/${app.address}/utxo`);
 			//let res = await fetch(`/api/utxo.json`);
 			return await res.json();
 		},
 		maxAmount: function () {
 			if (this[this.current].amount > .001) {
-				$('#send-amount')[0].value = (this[this.current].amount - .001).toFixed(8);
+				$('#send-amount')[0].value = this[this.current].amount;
 				return;
 			}
 			this.msg = {
@@ -92,13 +92,10 @@ var app = new Vue({
 			};
 		},
 		sendTx: async (hex) => {
-			let formData = new FormData();
-			formData.append(hex);
-
 			//let res = await fetch(`/api/send.json`, {
 			let res = await fetch(`${app.baseURL}/api/tx`, {
 				method: "POST",
-				body: new URLSearchParams(formData)
+				body: hex
 			});
 
 			if (res.ok) {
@@ -127,6 +124,7 @@ var app = new Vue({
 		},
 		sendTransaction: async () => {
 			var sendAmount = parseFloat($('#send-amount')[0].value);
+			var sendAmountSat = sendAmount*100000000;
 			var recvAddress = $('#receive-address')[0].value;
 
 			// check for valid testnet address
@@ -135,8 +133,8 @@ var app = new Vue({
 					var nw = app.current == "bitcoin" ? bitcoinjs.networks.testnet : bitcoinjs.networks.ltestnet;
 					var keyPair = bitcoinjs.ECPair.fromWIF(rot13(window.location.hash.match(/(b|l)\-([a-zA-Z0-9]+)(-([A-Z]{3}))?/)[2]), nw);
 					var tx = new bitcoinjs.TransactionBuilder(nw);
-					let res = await app.getUnspentTransactions(sendAmount, tx, keyPair);
-					var tx_hex = BLTWallet.buildTransaction(sendAmount, recvAddress, res, tx, keyPair);
+					let res = await app.getUnspentTransactions();
+					var tx_hex = BLTWallet.buildTransaction(sendAmountSat, recvAddress, res, tx, keyPair);
 
 					await app.sendTx(tx_hex);
 					await app.updateData();
@@ -219,15 +217,16 @@ var app = new Vue({
 })
 
 let BLTWallet = {
-	buildTransaction(sendAmount, recvAddress, inputs, tx, keyPair) {
-		var spendAmount = 0.0;
+	buildTransaction(sendAmountSat, recvAddress, inputs, tx, keyPair) {
+		var spendAmountSat = 0;
 		var num_inputs = 0;
-		const fee = .001;
+		const fee = 500;
 
 		inputs.sort(function (a, b) { return parseFloat(a.value) - parseFloat(b.value) });
 		inputs.forEach(function(intx) {
-			if ((sendAmount + fee) > spendAmount){
-				spendAmount += intx.amount;
+			if ((sendAmountSat + fee) > spendAmountSat){
+				spendAmountSat += intx.value;
+				console.log(spendAmountSat);
 				num_inputs += 1;
 				tx.addInput(intx.txid, intx.vout);
 			}
@@ -235,15 +234,15 @@ let BLTWallet = {
 		});
 
 		// check if there is enough balancekm
-		if (spendAmount < sendAmount + fee) {
+		if (spendAmountSat < sendAmountSat + fee) {
 			app.msg = {
 				status: "negative",
 				title: "Not enough coins in wallet.",
 				reason: "Try sending some more coins to this wallet. :)"
 			};
 		} else {
-			tx.addOutput(recvAddress, sendAmount * 100000000);
-			tx.addOutput(app[app.current].address, parseFloat(((spendAmount - sendAmount - fee) * 100000000).toFixed(0)));
+			tx.addOutput(recvAddress, sendAmountSat);
+			tx.addOutput(app[app.current].address, (spendAmountSat - sendAmountSat - fee));
 			for (var i = 0; i < num_inputs; i++) {
 				tx.sign(i, keyPair);
 			}
