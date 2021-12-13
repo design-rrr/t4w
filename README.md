@@ -1,16 +1,19 @@
-# BLT Wallet
+# Signet Wallet
 
-An open source testnet web wallet for Bitcoin and Litecoin
+An open source Signet web wallet for Bitcoin
 
-![blt-wallet screenshot](https://raw.githubusercontent.com/sereneblue/blt-wallet/master/blt-wallet.png)
+If you'd like to see this Signet revival of blt-wallet in action, click [here](https://blt.bublina.eu.org). You can also save blt-wallet for local usage. Use the index.html file located in the `src` folder.
 
-If you'd like to see blt-wallet in action, click [here](https://sereneblue.github.io/blt-wallet/). You can also save blt-wallet for local usage. Use the index.html file located in the `src` folder.
+Compatible with Android 7.0+ WebView (Chrome v51),
+Android 4.2.2 Opera 50.6 and Firefox Focus 2.3.
 
-Compatible with Android 7.0+ WebView (Chrome v51) and Firefox Focus 2.3.
+## Changes
+
+ - everything is denominated in satoshi (sat) now
+ - fee is statically set to 5000 sat
 
 ## Special Thanks
 
-- Bitpay and Litecore for the Insight API
+- mempool.space for the API
 - cryptocompare.com for the prices
 - BLT Wallet icon from Clipart Library, http://clipart-library.com/clipart/zcXeXaX9i.htm
-- Corsica_S for the ding audio sound, https://freesound.org/people/Corsica_S/sounds/91926/
