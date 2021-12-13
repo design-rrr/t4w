@@ -73,6 +73,24 @@ var app = new Vue({
 				if (vouts[i].scriptpubkey_address == this.address) return vouts[i].value;
 			}
 		},
+		getOurFunction: function (vouts) {
+			let total = 0;
+			vouts.forEach( vout => {
+				if (vout.scriptpubkey_address == this.address) {
+					total += vout.value;
+				};
+			});
+			return total;
+		},
+		getOutFunction: function (vins) {
+			let total = 0;
+			vins.forEach( vin => {
+				if (vin.prevout.scriptpubkey_address == this.address) {
+					total += vin.prevout.value;
+				};
+			});
+			return total;
+		},
 		// used only in Send
 		getUnspentTransactions: async () => {
 			let res = await fetch(`${app.baseURL}/api/address/${app.address}/utxo`);

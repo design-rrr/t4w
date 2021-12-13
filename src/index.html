@@ -131,7 +131,7 @@
 							</td>
 							<td><span :data-livestamp="tx.status.block_time"></span></td>
 							<td><a :href="'https://ex.signet.bublina.eu.org/tx/' + tx.txid" target="_blank">{{ tx.txid }}</a></td>
-							<td v-if="tx.vin[0].prevout.scriptpubkey_address == address" class="negative">-{{ tx.vout[0].value }} sat</td>
+							<td v-if="tx.vin[0].prevout.scriptpubkey_address == address" class="negative">-{{ getOutFunction(tx.vin) - getOurFunction(tx.vout) }} sat</td>
 							<td v-else class="positive">+{{ getOutputValue(tx.vout) }} sat</td>
 						</tr>
 				  </tbody>
