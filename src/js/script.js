@@ -225,7 +225,6 @@ let BLTWallet = {
 		inputs.forEach(function(intx) {
 			if ((sendAmount + fee) > spendAmount){
 				spendAmount += intx.value;
-				console.log(spendAmount);
 				num_inputs += 1;
 				tx.addInput(intx.txid, intx.vout);
 			}
