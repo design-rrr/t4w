@@ -130,9 +130,9 @@
 								<i v-if="! tx.status.confirmed" class="medium hourglass start icon"></i>
 							</td>
 							<td><span :data-livestamp="tx.status.block_time"></span></td>
-							<td><a :href="baseURL + '/tx/' + tx.txid" target="_blank">{{ tx.txid }}</a></td>
-							<td v-if="tx.vin[0].prevout.scriptpubkey_address == address" class="negative">-{{ tx.vout[0].value / 100000000}} {{ symbol }}</td>
-							<td v-else class="positive">+{{ getOutputValue(tx.vout) / 100000000 }} {{ symbol }}</td>
+							<td><a :href="'https://ex.signet.bublina.eu.org/tx/' + tx.txid" target="_blank">{{ tx.txid }}</a></td>
+							<td v-if="tx.vin[0].prevout.scriptpubkey_address == address" class="negative">-{{ tx.vout[0].value }} sat</td>
+							<td v-else class="positive">+{{ getOutputValue(tx.vout) }} sat</td>
 						</tr>
 				  </tbody>
 			</table>
@@ -144,7 +144,7 @@
 			<div class="content">
 				<div class="ui form">
 					<div class="field">
-						<label>Amount (A .001 miner fee is deducted from your balance)</label>
+						<label>Amount</label>
 						<div class="ui action input">
 						  <input id="send-amount" placeholder="Amount..." type="number">
 						  <button class="ui button" @click="maxAmount()">max</button>

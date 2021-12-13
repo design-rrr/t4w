@@ -20,7 +20,6 @@ var app = new Vue({
 				[" - signetfaucet.com", "https://signetfaucet.com"]
 			],
 			price: 0,
-			symbol: "tBTC",
 			tx: [
 			]
 		},
@@ -81,8 +80,8 @@ var app = new Vue({
 			return await res.json();
 		},
 		maxAmount: function () {
-			if (this[this.current].amount > .001) {
-				$('#send-amount')[0].value = this[this.current].amount;
+			if (this[this.current].amount > 5000) {
+				$('#send-amount')[0].value = (this[this.current].amount - 5000);
 				return;
 			}
 			this.msg = {
@@ -99,21 +98,26 @@ var app = new Vue({
 			});
 
 			if (res.ok) {
-				let data = await res.json();
+				let data = await res.text();
+				console.log(data);
 
-				app.msg = data.txid ? {
+				app.msg = data ? {
 					status:"positive",
 					title: "Transaction was successfully sent! Please wait for the wallet to update.",
-					reason: `TXID: ${data.txid}`
+					reason: `TXID: ${data}`
 				} : {
 					status: "negative",
 					title: "Could not send transaction",
 					reason: "Something went wrong. :("
 				}
-
-				if (data.txid) app.updateTransactions();
+				if (data) {
+					app.updateTransactions();
+					$('#send-amount')[0].value = "";
+					$('#receive-address')[0].value = "";
+				}
 			} else {
-				let data = await res.text();
+				let data = await res.json();
+				//let data = await res.text();
 
 				app.msg = {
 					status:"negative",
@@ -124,17 +128,16 @@ var app = new Vue({
 		},
 		sendTransaction: async () => {
 			var sendAmount = parseFloat($('#send-amount')[0].value);
-			var sendAmountSat = sendAmount*100000000;
 			var recvAddress = $('#receive-address')[0].value;
 
 			// check for valid testnet address
 			if (BLTWallet.checkValidAddress(recvAddress, app.current)) {
-				if (app[app.current].amount > 0 && sendAmount < app[app.current].amount) {
+				if (app[app.current].amount > 0 && sendAmount <= app[app.current].amount) {
 					var nw = app.current == "bitcoin" ? bitcoinjs.networks.testnet : bitcoinjs.networks.ltestnet;
 					var keyPair = bitcoinjs.ECPair.fromWIF(rot13(window.location.hash.match(/(b|l)\-([a-zA-Z0-9]+)(-([A-Z]{3}))?/)[2]), nw);
 					var tx = new bitcoinjs.TransactionBuilder(nw);
 					let res = await app.getUnspentTransactions();
-					var tx_hex = BLTWallet.buildTransaction(sendAmountSat, recvAddress, res, tx, keyPair);
+					var tx_hex = BLTWallet.buildTransaction(sendAmount, recvAddress, res, tx, keyPair);
 
 					await app.sendTx(tx_hex);
 					await app.updateData();
@@ -178,7 +181,7 @@ var app = new Vue({
 			//	document.getElementById('audio').play();
 			//}
 
-			app[app.current].amount = (data.chain_stats.funded_txo_sum - data.chain_stats.spent_txo_sum) / 100000000;
+			app[app.current].amount = (data.chain_stats.funded_txo_sum - data.chain_stats.spent_txo_sum);
 
 			res = await fetch(`${app.baseURL}/api/address/${app.address}/txs`);
 			//res = await fetch(`/api/txs.json`);
@@ -192,11 +195,10 @@ var app = new Vue({
 			return this[this.current].address;
 		},
 		amount: function () {
-			return `${this[this.current].amount} ${this[this.current].symbol}`;
+			return `${this[this.current].amount} sat`;
 		},
 		baseURL: function () {
-			//return app.symbol == "BTC" ? "https://test-insight.bitpay.com" : "https://testnet.litecore.io"
-			return app.symbol == "tBTC" ? "https://mempool.space/signet" : "https://testnet.litecore.io"
+			return "https://mempool.space/signet"
 		},
 		color: function () {
 			return this[this.current].color;
@@ -205,10 +207,7 @@ var app = new Vue({
 			return this[this.current].faucets;
 		},
 		fiat_amount: function () {
-			return `${this.currencies[this.currentFiat]}${(this[this.current].amount * this[this.current].price).toFixed(2)} ${this.currentFiat}`;
-		},
-		symbol: function () {
-			return this[this.current].symbol;
+			return `${this.currencies[this.currentFiat]}${(this[this.current].amount * this[this.current].price / 100000000).toFixed(2)} ${this.currentFiat}`;
 		},
 		transactions: function () {
 			return this[this.current].tx;
@@ -217,16 +216,16 @@ var app = new Vue({
 })
 
 let BLTWallet = {
-	buildTransaction(sendAmountSat, recvAddress, inputs, tx, keyPair) {
-		var spendAmountSat = 0;
+	buildTransaction(sendAmount, recvAddress, inputs, tx, keyPair) {
+		var spendAmount = 0;
 		var num_inputs = 0;
-		const fee = 500;
+		const fee = 5000;
 
-		inputs.sort(function (a, b) { return parseFloat(a.value) - parseFloat(b.value) });
+		inputs.sort(function (a, b) { return a.value > b.value });
 		inputs.forEach(function(intx) {
-			if ((sendAmountSat + fee) > spendAmountSat){
-				spendAmountSat += intx.value;
-				console.log(spendAmountSat);
+			if ((sendAmount + fee) > spendAmount){
+				spendAmount += intx.value;
+				console.log(spendAmount);
 				num_inputs += 1;
 				tx.addInput(intx.txid, intx.vout);
 			}
@@ -234,15 +233,16 @@ let BLTWallet = {
 		});
 
 		// check if there is enough balancekm
-		if (spendAmountSat < sendAmountSat + fee) {
+		if (spendAmount < sendAmount + fee) {
 			app.msg = {
 				status: "negative",
 				title: "Not enough coins in wallet.",
 				reason: "Try sending some more coins to this wallet. :)"
 			};
 		} else {
-			tx.addOutput(recvAddress, sendAmountSat);
-			tx.addOutput(app[app.current].address, (spendAmountSat - sendAmountSat - fee));
+			tx.addOutput(recvAddress, sendAmount);
+			var diff = (spendAmount - sendAmount - fee);
+			if (diff > 10000) tx.addOutput(app[app.current].address, diff);
 			for (var i = 0; i < num_inputs; i++) {
 				tx.sign(i, keyPair);
 			}
