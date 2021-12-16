@@ -95,8 +95,8 @@
 		<div class="pusher">
 			<div class="ui inverted teal vertical masthead center aligned segment" id="price-header">
 				<div class="price">
-					<h1>{{ amount }}</h1>
-					<h2>{{ fiat_amount }}</h2>
+					<h1>{{ amount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") }}</h1>
+					<h2>{{ fiat_amount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") }}</h2>
 					<button :class="color" class="ui button" @click="showModal()">
 						<i class="send outline icon"></i>
 						Send
@@ -131,8 +131,8 @@
 							</td>
 							<td><span :data-livestamp="tx.status.block_time"></span></td>
 							<td><a :href="'https://ex.signet.bublina.eu.org/tx/' + tx.txid" target="_blank">{{ tx.txid }}</a></td>
-							<td v-if="tx.vin[0].prevout.scriptpubkey_address == address" class="negative">-{{ getOutFunction(tx.vin) - getOurFunction(tx.vout) }} sat</td>
-							<td v-else class="positive">+{{ getOutputValue(tx.vout) }} sat</td>
+							<td v-if="tx.vin[0].prevout.scriptpubkey_address == address" class="negative right aligned">-{{ (getOutFunction(tx.vin) - getOurFunction(tx.vout)).toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ") }} sat</td>
+							<td v-else class="positive right aligned">+{{ getOutputValue(tx.vout).toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ") }} sat</td>
 						</tr>
 				  </tbody>
 			</table>
