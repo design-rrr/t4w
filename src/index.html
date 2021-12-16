@@ -131,8 +131,8 @@
 							</td>
 							<td><span :data-livestamp="tx.status.block_time"></span></td>
 							<td><a :href="'https://ex.signet.bublina.eu.org/tx/' + tx.txid" target="_blank">{{ tx.txid }}</a></td>
-							<td v-if="tx.vin[0].prevout.scriptpubkey_address == address" class="negative right aligned">-{{ (getOutFunction(tx.vin) - getOurFunction(tx.vout)).toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ") }} sat</td>
-							<td v-else class="positive right aligned">+{{ getOutputValue(tx.vout).toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ") }} sat</td>
+							<td v-if="tx.vin[0].prevout.scriptpubkey_address == address" class="negative right aligned">-{{ (getOutFunction(tx.vin) - getOurFunction(tx.vout)).toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ") }} sat &nbsp;</td>
+							<td v-else class="positive right aligned">+{{ getOutputValue(tx.vout).toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ") }} sat &nbsp;</td>
 						</tr>
 				  </tbody>
 			</table>
