@@ -69,9 +69,13 @@ var app = new Vue({
 			input.remove();
 		},
 		getOutputValue: function (vouts) {
+			let total = 0;
 			for (var i = 0; i < vouts.length; i++) {
-				if (vouts[i].scriptpubkey_address == this.address) return vouts[i].value;
-			}
+				if (vouts[i].scriptpubkey_address == this.address) {
+					total += vouts[i].value;
+				};
+			};
+			return total;
 		},
 		getOurFunction: function (vouts) {
 			let total = 0;
