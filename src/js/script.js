@@ -16,8 +16,8 @@ var app = new Vue({
 			amount: 0,
 			color: "orange",
 			faucets: [
-				[" - signet.bublina", "https://signet.bublina.eu.org"],
-				[" - signetfaucet.com", "https://signetfaucet.com"]
+				[" - signetfaucet.com", "https://signetfaucet.com"],
+				[" - alt.signetfaucet.com", "https://alt.signetfaucet.com"]
 			],
 			price: 0,
 			tx: [
