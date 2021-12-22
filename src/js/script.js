@@ -91,6 +91,12 @@ var app = new Vue({
 			});
 			return total;
 		},
+		positive_tx: function (vout) {
+			return this.getOutputValue(vout).toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+		},
+		negative_tx: function (vin, vout) {
+			return (this.getOutFunction(vin) - this.getOurFunction(vout)).toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+		},
 		// used only in Send
 		getUnspentTransactions: async () => {
 			let res = await fetch(`${app.baseURL}/api/address/${app.address}/utxo`);
@@ -213,7 +219,7 @@ var app = new Vue({
 			return this[this.current].address;
 		},
 		amount: function () {
-			return `${this[this.current].amount} sat`;
+			return `${this[this.current].amount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")} sat`;
 		},
 		baseURL: function () {
 			return "https://mempool.space/signet"
@@ -225,7 +231,7 @@ var app = new Vue({
 			return this[this.current].faucets;
 		},
 		fiat_amount: function () {
-			return `${this.currencies[this.currentFiat]}${(this[this.current].amount * this[this.current].price / 100000000).toFixed(2)} ${this.currentFiat}`;
+			return `${this.currencies[this.currentFiat]}${(this[this.current].amount * this[this.current].price / 100000000).toFixed(2).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")} ${this.currentFiat}`;
 		},
 		transactions: function () {
 			return this[this.current].tx;
