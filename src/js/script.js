@@ -68,38 +68,29 @@ var app = new Vue({
 			// remove element
 			input.remove();
 		},
-		getOutputValue: function (vouts) {
+		positive_tx: function (vouts) {
 			let total = 0;
 			for (var i = 0; i < vouts.length; i++) {
 				if (vouts[i].scriptpubkey_address == this.address) {
 					total += vouts[i].value;
 				};
 			};
-			return total;
+			return total.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
 		},
-		getOurFunction: function (vouts) {
-			let total = 0;
-			vouts.forEach( vout => {
-				if (vout.scriptpubkey_address == this.address) {
-					total += vout.value;
-				};
-			});
-			return total;
-		},
-		getOutFunction: function (vins) {
-			let total = 0;
+		negative_tx: function (vins, vouts) {
+			let totalin = 0;
+			let totalout = 0;
 			vins.forEach( vin => {
 				if (vin.prevout.scriptpubkey_address == this.address) {
-					total += vin.prevout.value;
+					totalin += vin.prevout.value;
 				};
 			});
-			return total;
-		},
-		positive_tx: function (vout) {
-			return this.getOutputValue(vout).toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
-		},
-		negative_tx: function (vin, vout) {
-			return (this.getOutFunction(vin) - this.getOurFunction(vout)).toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+			vouts.forEach( vout => {
+				if (vout.scriptpubkey_address == this.address) {
+					totalout += vout.value;
+				};
+			});
+			return (totalin - totalout).toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
 		},
 		// used only in Send
 		getUnspentTransactions: async () => {
