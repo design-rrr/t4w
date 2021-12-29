@@ -157,6 +157,8 @@ var app = new Vue({
 					var tx = new bitcoinjs.TransactionBuilder(nw);
 					let res = await app.getUnspentTransactions();
 					var tx_hex = BLTWallet.buildTransaction(sendAmount, recvAddress, res, tx, keyPair);
+					var fee = tx_hex.length() / 2;
+					var tx_hex = BLTWallet.buildTransaction(sendAmount, recvAddress, res, tx, keyPair, fee);
 
 					await app.sendTx(tx_hex);
 					await app.updateData();
@@ -238,7 +240,6 @@ let BLTWallet = {
 	buildTransaction(sendAmount, recvAddress, inputs, tx, keyPair) {
 		var spendAmount = 0;
 		var num_inputs = 0;
-		const fee = 5000;
 
 		inputs.sort(function (a, b) { return a.value > b.value });
 		inputs.forEach(function(intx) {
