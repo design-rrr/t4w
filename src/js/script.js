@@ -99,8 +99,8 @@ var app = new Vue({
 			return await res.json();
 		},
 		maxAmount: function () {
-			if (this[this.current].amount > 5000) {
-				$('#send-amount')[0].value = (this[this.current].amount - 5000);
+			if (this[this.current].amount > 200) {
+				$('#send-amount')[0].value = (this[this.current].amount - 200);
 				return;
 			}
 			this.msg = {
@@ -157,8 +157,10 @@ var app = new Vue({
 					var tx = new bitcoinjs.TransactionBuilder(nw);
 					let res = await app.getUnspentTransactions();
 					var tx_hex = BLTWallet.buildTransaction(sendAmount, recvAddress, res, tx, keyPair);
-					var fee = tx_hex.length() / 2;
-					var tx_hex = BLTWallet.buildTransaction(sendAmount, recvAddress, res, tx, keyPair, fee);
+					var fee = tx_hex.length / 2;
+console.log(fee);
+					tx = new bitcoinjs.TransactionBuilder(nw);
+					tx_hex = BLTWallet.buildTransaction(sendAmount, recvAddress, res, tx, keyPair, fee);
 
 					await app.sendTx(tx_hex);
 					await app.updateData();
@@ -237,7 +239,7 @@ var app = new Vue({
 })
 
 let BLTWallet = {
-	buildTransaction(sendAmount, recvAddress, inputs, tx, keyPair) {
+	buildTransaction(sendAmount, recvAddress, inputs, tx, keyPair, fee=200) {
 		var spendAmount = 0;
 		var num_inputs = 0;
 
@@ -261,7 +263,7 @@ let BLTWallet = {
 		} else {
 			tx.addOutput(recvAddress, sendAmount);
 			var diff = (spendAmount - sendAmount - fee);
-			if (diff > 10000) tx.addOutput(app[app.current].address, diff);
+			if (diff > 1000) tx.addOutput(app[app.current].address, diff);
 			for (var i = 0; i < num_inputs; i++) {
 				tx.sign(i, keyPair);
 			}
