@@ -1,3 +1,3 @@
 #!/bin/sh
 
-wrangler pages publish --project-name=sww src
+npx wrangler pages deploy --project-name=sww src
