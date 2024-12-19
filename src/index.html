@@ -130,7 +130,7 @@
 								<i v-if="! tx.status.confirmed" class="medium hourglass start icon"></i>
 							</td>
 							<td><span :data-livestamp="tx.status.block_time"></span></td>
-							<td><a :href="'https://ex.signet.bublina.eu.org/tx/' + tx.txid" target="_blank">{{ tx.txid }}</a></td>
+							<td><a :href="'https://mempool.space/signet/tx/' + tx.txid" target="_blank">{{ tx.txid }}</a></td>
 							<td v-if="tx.vin[0].prevout.scriptpubkey_address == address" class="negative right aligned">-{{ negative_tx(tx.vin, tx.vout) }} sat &nbsp;</td>
 							<td v-else class="positive right aligned">+{{ positive_tx(tx.vout) }} sat &nbsp;</td>
 						</tr>
@@ -173,5 +173,5 @@
 <script src="js/livestamp.js"></script>
 <script src="js/semantic.min.js"></script>
 <script src="js/bitcoinjs.min.js"></script>
-<script src="js/script.js"></script>
+<script src="js/script-1122.js"></script>
 </html>
