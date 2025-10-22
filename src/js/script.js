@@ -56,10 +56,11 @@ var app = new Vue({
 			var network = (this.current == "bitcoin") ? bitcoinjs.networks.testnet : bitcoinjs.networks.ltestnet
 
 			var keyPair = bitcoinjs.ECPair.fromWIF(priv_key, network);
-			var address = bitcoinjs.address.toBase58Check(
-				bitcoinjs.crypto.hash160(keyPair.publicKey),
-				network.pubKeyHash
-			)
+			// Generate P2WPKH (native SegWit) address
+			var address = bitcoinjs.payments.p2wpkh({
+				pubkey: keyPair.publicKey,
+				network: network
+			}).address;
 
 			if (window.location.hash[1] == "b") {
 				if (BLTWallet.checkValidAddress(address, 'bitcoin')) {
@@ -253,7 +254,7 @@ let BLTWallet = {
 			return;
 		});
 
-		// check if there is enough balancekm
+		// check if there is enough balance
 		if (spendAmount < sendAmount + fee) {
 			app.msg = {
 				status: "negative",
@@ -273,25 +274,33 @@ let BLTWallet = {
 	createNewAddress(network){
 		var nw = network == "bitcoin" ? bitcoinjs.networks.testnet : bitcoinjs.networks.ltestnet;
 		var keyPair = bitcoinjs.ECPair.makeRandom({ network: nw });
-		var address = bitcoinjs.address.toBase58Check(
-			bitcoinjs.crypto.hash160(keyPair.publicKey),
-			nw.pubKeyHash
-		)
+		
+		// Generate P2WPKH (native SegWit bech32) address
+		var address = bitcoinjs.payments.p2wpkh({
+			pubkey: keyPair.publicKey,
+			network: nw
+		}).address;
 
 		return [keyPair.toWIF(), address];
 	},
 	checkValidAddress(address, network) {
 		try {
-			return bitcoinjs.address.fromBase58Check(address, network == "bitcoin" ?
-				bitcoinjs.networks.testnet : bitcoinjs.networks.ltestnet
-			);
+			// Try bech32 (native SegWit) address validation
+			return bitcoinjs.address.fromBech32(address);
 		} catch(err) {
 			try {
-				return bitcoinjs.address.toOutputScript(address, network == "bitcoin" ?
+				// Fallback to base58 address validation
+				return bitcoinjs.address.fromBase58Check(address, network == "bitcoin" ?
 					bitcoinjs.networks.testnet : bitcoinjs.networks.ltestnet
 				);
 			} catch(err) {
-				return false;
+				try {
+					return bitcoinjs.address.toOutputScript(address, network == "bitcoin" ?
+						bitcoinjs.networks.testnet : bitcoinjs.networks.ltestnet
+					);
+				} catch(err) {
+					return false;
+				}
 			}
 		}
 	}
